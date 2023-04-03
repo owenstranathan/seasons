@@ -40,6 +40,8 @@ def get_year_seasons(year):
 
         payload = json.loads(data.decode())
     except:
+        print(f"Couldn't get seasons for {year}")
+        print(data)
         return {}
 
     seasons = payload["data"]
@@ -77,10 +79,7 @@ def get_season_day(d):
 def string_to_datetime(string):
     return datetime.strptime(string, "%m/%d/%Y")
 
-def main():
-    parser = ArgumentParser(prog="seasons")
-    parser.add_argument("datetime", type=string_to_datetime)
-    args = parser.parse_args()
+def dos(args):
     season_day = get_season_day(args.datetime)
     today = datetime.now()
     verb = "is"
@@ -90,13 +89,7 @@ def main():
 
 
 
-def main_one():
-
-    parser = ArgumentParser(prog = "seasons")
-
-    parser.add_argument("year", type=int)
-    parser.add_argument("range", type=int)
-    args = parser.parse_args()
+def y2y(args):
 
     years = [None] * args.range
     phtimes = [None] * args.range
@@ -162,4 +155,15 @@ def main_one():
     print(f"   days: {[f'{d:-4d}'if d is not None else '----' for d in total_days]}")
 
 if __name__ == "__main__":
-    main()
+
+    parser = ArgumentParser(prog = "seasons")
+
+    sub_parsers = parser.add_subparsers(help="commands", dest="command")
+    year_2_year = sub_parsers.add_parser("y2y")
+    year_2_year.add_argument("year", type=int)
+    year_2_year.add_argument("range", type=int)
+
+    day_of_season = sub_parsers.add_parser("dos")
+    day_of_season.add_argument("datetime", type=string_to_datetime, help="The date you want to know about in MM/DD/YYYY format")
+    args = parser.parse_args()
+    vars()[args.command](args)
